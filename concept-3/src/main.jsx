@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { ArrowDown, ArrowRight, CalendarDays, Check, CheckCircle2, ChevronDown, Clock3, MapPin, MessageSquare, Pill, Plus, Printer, Stethoscope, UserRound } from 'lucide-react';
+import { ArrowDown, ArrowRight, CalendarDays, Check, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Clock3, MapPin, MessageSquare, Pill, Plus, Printer, Stethoscope, UserRound } from 'lucide-react';
 import './style.css';
 
 const initialSteps = [
@@ -9,12 +9,20 @@ const initialSteps = [
 ];
 
 function pageFromPath(path) {
-  if (path.endsWith('/appointments')) return 'appointments';
+  if (path.endsWith('/calendar') || path.endsWith('/appointments')) return 'calendar';
   if (path.endsWith('/medication')) return 'medication';
   return 'summary';
 }
 
-const pagePaths = { summary: '/concept-3/', appointments: '/concept-3/appointments', medication: '/concept-3/medication' };
+const pagePaths = { summary: '/concept-3/', calendar: '/concept-3/calendar', medication: '/concept-3/medication' };
+
+function dateKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+function prettyDate(date) {
+  return new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }).format(date);
+}
 
 function App() {
   const [steps, setSteps] = useState(initialSteps);
@@ -23,6 +31,8 @@ function App() {
   const [appointment, setAppointment] = useState(null);
   const [showAppointmentForm, setShowAppointmentForm] = useState(false);
   const [reminder, setReminder] = useState(true);
+  const [calendarMonth, setCalendarMonth] = useState(() => new Date(2026, 9, 1));
+  const [selectedDate, setSelectedDate] = useState('2026-10-14');
 
   useEffect(() => {
     const onPopState = () => setPage(pageFromPath(window.location.pathname));
@@ -49,22 +59,38 @@ function App() {
   function saveAppointment(event) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
-    setAppointment({ date: form.get('date'), time: form.get('time'), type: form.get('type') });
+    const date = form.get('date');
+    setAppointment({ date, time: form.get('time'), type: form.get('type') });
+    setSelectedDate(date);
+    setCalendarMonth(new Date(`${date}T12:00:00`));
     setShowAppointmentForm(false);
     showNotice('Appointment added to this demo schedule.');
   }
 
   const pageMeta = {
     summary: ['AFTER YOUR APPOINTMENT', 'Your visit summary', 'A clear record of what you discussed with your GP.'],
-    appointments: ['YOUR CARE PLAN', 'Appointments', 'Keep track of visits and the next steps around your care.'],
-    medication: ['YOUR PRESCRIPTION', 'Medication', 'Prescription and collection details from your GP visit.'],
+    calendar: ['YOUR CARE PLAN', 'Calendar', 'Appointments and care reminders in one place.'],
+    medication: ['YOUR PRESCRIPTION', 'Medication & extras', 'Prescription and collection details from your GP visit.'],
   }[page];
+
+  const monthStart = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), 1);
+  const monthOffset = (monthStart.getDay() + 6) % 7;
+  const calendarStart = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), 1 - monthOffset);
+  const cellCount = Math.ceil((monthOffset + new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 0).getDate()) / 7) * 7;
+  const calendarDays = Array.from({ length: cellCount }, (_, index) => new Date(calendarStart.getFullYear(), calendarStart.getMonth(), calendarStart.getDate() + index));
+  const calendarEvents = [
+    { date: '2026-10-12', kind: 'appointment', title: 'GP consultation', detail: 'Dr. J. van Dijk · Migraine' },
+    { date: '2026-10-14', kind: 'reminder', title: 'Headache diary', detail: 'Note when a headache starts and what you were doing.' },
+    { date: '2026-10-15', kind: 'pickup', title: 'Prescription collection', detail: 'Linden Pharmacy · after 09:00' },
+    ...(appointment ? [{ date: appointment.date, kind: 'appointment', title: appointment.type, detail: `${appointment.time} · Personal calendar entry` }] : []),
+  ];
+  const selectedEvents = calendarEvents.filter(event => event.date === selectedDate);
 
   return <div className="page-shell">
     <header className="topbar">
       <a className="practice-name" href="/" aria-label="Back to concept selection"><span className="practice-mark"><Stethoscope size={17} /></span><span>Northside Family Practice</span></a>
       <nav className="top-nav" aria-label="Patient record">
-        {[['summary', 'Visit summary'], ['appointments', 'Appointments'], ['medication', 'Medication']].map(([id, label]) => <button key={id} className={page === id ? 'selected' : ''} aria-current={page === id ? 'page' : undefined} onClick={() => navigate(id)}>{label}</button>)}
+        {[['summary', 'Visit summary'], ['calendar', 'Calendar'], ['medication', 'Medication & extras']].map(([id, label]) => <button key={id} className={page === id ? 'selected' : ''} aria-current={page === id ? 'page' : undefined} onClick={() => navigate(id)}>{label}</button>)}
       </nav>
       <button className="patient-menu" onClick={() => showNotice('Signed in as Emma de Vries')}><span className="avatar">EV</span><span>Emma de Vries</span><ChevronDown size={15} /></button>
     </header>
@@ -72,7 +98,7 @@ function App() {
     <main className="content">
       <div className="page-heading">
         <div><div className="overline">{pageMeta[0]}</div><h1>{pageMeta[1]}</h1><p>{pageMeta[2]}</p></div>
-        <button className="quiet-button" onClick={() => page === 'appointments' ? setShowAppointmentForm(true) : window.print()}>{page === 'appointments' ? <><Plus size={16} /> Add appointment</> : <><Printer size={16} /> Print</>}</button>
+        <button className="quiet-button" onClick={() => page === 'calendar' ? setShowAppointmentForm(true) : window.print()}>{page === 'calendar' ? <><Plus size={16} /> Add to calendar</> : <><Printer size={16} /> Print</>}</button>
       </div>
 
       {page === 'summary' && <>
@@ -101,34 +127,32 @@ function App() {
             </section>
           </div>
           <aside className="side-column">
-            <button className="summary-link-card" onClick={() => navigate('appointments')}><span className="side-icon calendar"><CalendarDays size={17} /></span><span><b>Appointments</b><small>{appointment ? `${appointment.type} · ${appointment.date}` : 'No follow-up booked'}</small></span><ArrowRight size={16} /></button>
-            <button className="summary-link-card" onClick={() => navigate('medication')}><span className="side-icon"><Pill size={17} /></span><span><b>Medication</b><small>Sumatriptan · 50 mg · pickup tomorrow</small></span><ArrowRight size={16} /></button>
+            <button className="summary-link-card" onClick={() => navigate('calendar')}><span className="side-icon calendar"><CalendarDays size={17} /></span><span><b>Calendar</b><small>{appointment ? `${appointment.type} · ${appointment.date}` : 'No follow-up booked'}</small></span><ArrowRight size={16} /></button>
+            <button className="summary-link-card" onClick={() => navigate('medication')}><span className="side-icon"><Pill size={17} /></span><span><b>Medication & extras</b><small>Sumatriptan · 50 mg · pickup tomorrow</small></span><ArrowRight size={16} /></button>
             <button className="contact-card" onClick={() => showNotice('Your practice contact details are ready.')}><span className="contact-icon"><MessageSquare size={17} /></span><span><b>Questions about this summary?</b><small>Contact your family practice</small></span><ArrowRight size={16} /></button>
           </aside>
         </div>
       </>}
 
-      {page === 'appointments' && <div className="appointments-page">
-        <section className="next-visit-card">
-          <div className="next-visit-copy"><div className="card-kicker">NEXT APPOINTMENT</div><h2>{appointment ? appointment.type : 'No follow-up booked'}</h2><p>{appointment ? `Added for ${appointment.date} at ${appointment.time}.` : 'Your GP did not schedule a follow-up. You can add an appointment here if you arrange one with the practice.'}</p>{!appointment && <button className="text-action" onClick={() => setShowAppointmentForm(true)}><Plus size={15} /> Add an appointment you arranged <ArrowRight size={15} /></button>}</div>
-          <div className="calendar-date-card"><CalendarDays size={20} /><span>{appointment ? appointment.date : '12 OCT'}</span><small>{appointment ? appointment.time : 'Last visit'}</small></div>
-        </section>
-
-        <div className="appointment-columns">
-          <section className="page-panel care-calendar">
-            <div className="panel-title-row"><div><h2>Care timeline</h2><p>Recent and upcoming items</p></div><span className="month-label">October 2026 <ChevronDown size={14}/></span></div>
-            <div className="timeline-list">
-              {appointment && <article className="timeline-item upcoming"><div className="timeline-date"><b>{appointment.date.slice(8, 10)}</b><small>OCT</small></div><div className="timeline-marker"><i/></div><div className="timeline-text"><span className="timeline-status">UPCOMING</span><h3>{appointment.type}</h3><p>{appointment.time} · Northside Family Practice</p></div></article>}
-              <article className="timeline-item"><div className="timeline-date"><b>15</b><small>OCT</small></div><div className="timeline-marker"><i/></div><div className="timeline-text"><span className="timeline-status pharmacy-status">PICK-UP</span><h3>Prescription ready</h3><p>Linden Pharmacy · after 09:00</p><button onClick={() => navigate('medication')}>View medication <ArrowRight size={14}/></button></div></article>
-              <article className="timeline-item"><div className="timeline-date"><b>14</b><small>OCT</small></div><div className="timeline-marker"><i/></div><div className="timeline-text"><span className="timeline-status today-status">TODAY</span><h3>Keep a headache diary</h3><p>Note when a headache starts and what you were doing.</p></div></article>
-              <article className="timeline-item past"><div className="timeline-date"><b>12</b><small>OCT</small></div><div className="timeline-marker"><i/></div><div className="timeline-text"><span className="timeline-status">COMPLETED</span><h3>GP consultation · Migraine</h3><p>Dr. J. van Dijk · Northside Family Practice</p><button onClick={() => navigate('summary')}>Open visit summary <ArrowRight size={14}/></button></div></article>
-            </div>
-          </section>
-          <div className="appointment-side">
-            <section className="page-panel followup-panel"><span className="side-icon calendar"><CalendarDays size={17}/></span><div className="card-kicker">FOLLOW-UP PLAN</div><h2>When to book</h2><p>Contact the practice if your headaches become more frequent, change, or your medication is not helping.</p><button className="secondary-action" onClick={() => showNotice('Northside Family Practice · 020 555 0140')}>Practice contact details <ArrowRight size={14}/></button></section>
-            <section className="page-panel prep-panel"><div className="card-kicker">BEFORE YOUR NEXT VISIT</div><h2>Helpful to bring</h2><ul><li><CheckCircle2 size={15}/> Your headache diary</li><li><CheckCircle2 size={15}/> Any questions about treatment</li><li><CheckCircle2 size={15}/> Your current medication</li></ul></section>
+      {page === 'calendar' && <div className="calendar-page">
+        <section className="page-panel calendar-panel">
+          <div className="calendar-panel-head"><div><div className="card-kicker">CARE CALENDAR</div><h2>{new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric' }).format(calendarMonth)}</h2></div><div className="calendar-controls"><button aria-label="Previous month" onClick={() => {const next = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1); setCalendarMonth(next); setSelectedDate(dateKey(next));}}><ChevronLeft size={17}/></button><button className="today-button" onClick={() => {const today = new Date(2026, 9, 14); setCalendarMonth(new Date(2026, 9, 1)); setSelectedDate(dateKey(today));}}>Today</button><button aria-label="Next month" onClick={() => {const next = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1); setCalendarMonth(next); setSelectedDate(dateKey(next));}}><ChevronRight size={17}/></button></div></div>
+          <div className="calendar-grid" role="grid" aria-label="Calendar">
+            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => <div className="weekday" role="columnheader" key={day}>{day}</div>)}
+            {calendarDays.map(day => {
+              const key = dateKey(day);
+              const events = calendarEvents.filter(event => event.date === key);
+              return <button role="gridcell" aria-selected={selectedDate === key} key={key} className={`calendar-day ${day.getMonth() === calendarMonth.getMonth() ? '' : 'outside'} ${selectedDate === key ? 'selected-day' : ''}`} onClick={() => {setSelectedDate(key); if (day.getMonth() !== calendarMonth.getMonth()) setCalendarMonth(new Date(day.getFullYear(), day.getMonth(), 1));}}><span>{day.getDate()}</span>{events.length > 0 && <i className={`event-dots ${events[0].kind}`} />}</button>;
+            })}
           </div>
-        </div>
+          <div className="calendar-legend"><span><i className="legend-visit"/> Appointment</span><span><i className="legend-reminder"/> Reminder</span><span><i className="legend-pickup"/> Prescription pickup</span></div>
+        </section>
+        <aside className="calendar-agenda">
+          <section className="page-panel selected-day-panel"><div className="selected-date-heading"><div><div className="card-kicker">SELECTED DAY</div><h2>{prettyDate(new Date(`${selectedDate}T12:00:00`))}</h2></div><span className="selected-date-icon"><CalendarDays size={18}/></span></div>
+            {selectedEvents.length ? <div className="selected-events">{selectedEvents.map((event, index) => <article className="selected-event" key={`${event.date}-${event.title}-${index}`}><span className={`event-type-icon ${event.kind}`}>{event.kind === 'pickup' ? <Pill size={16}/> : event.kind === 'appointment' ? <Stethoscope size={16}/> : <CheckCircle2 size={16}/>}</span><div><span className="event-label">{event.kind === 'pickup' ? 'PRESCRIPTION PICKUP' : event.kind === 'appointment' ? 'APPOINTMENT' : 'CARE REMINDER'}</span><h3>{event.title}</h3><p>{event.detail}</p>{event.kind === 'appointment' && event.date === '2026-10-12' && <button onClick={() => navigate('summary')}>View visit summary <ArrowRight size={13}/></button>}{event.kind === 'pickup' && <button onClick={() => navigate('medication')}>View medication <ArrowRight size={13}/></button>}</div></article>)}</div> : <div className="day-empty"><CalendarDays size={20}/><b>Nothing planned for this day</b><span>Add an appointment or reminder you arranged yourself.</span><button onClick={() => setShowAppointmentForm(true)}><Plus size={14}/> Add to calendar</button></div>}
+          </section>
+          <section className="page-panel upcoming-panel"><div className="panel-title-row"><div><h2>Coming up</h2><p>Next items in your care plan</p></div></div><button className="upcoming-row" onClick={() => {setSelectedDate('2026-10-15'); setCalendarMonth(new Date(2026, 9, 1));}}><span className="upcoming-date">15<small>OCT</small></span><span><b>Prescription pickup</b><small>Linden Pharmacy · after 09:00</small></span><ChevronRight size={15}/></button>{appointment && <button className="upcoming-row" onClick={() => {setSelectedDate(appointment.date); setCalendarMonth(new Date(`${appointment.date}T12:00:00`));}}><span className="upcoming-date">{appointment.date.slice(8, 10)}<small>{new Intl.DateTimeFormat('en-GB', { month: 'short' }).format(new Date(`${appointment.date}T12:00:00`)).toUpperCase()}</small></span><span><b>{appointment.type}</b><small>{appointment.time} · Personal calendar</small></span><ChevronRight size={15}/></button>}<div className="calendar-help"><span className="side-icon calendar"><Clock3 size={16}/></span><p>Your GP suggested keeping a headache diary before your next visit.</p></div></section>
+        </aside>
       </div>}
 
       {page === 'medication' && <div className="medication-page">
@@ -149,7 +173,7 @@ function App() {
       <footer className="page-footer"><span>{pageMeta[1]} · Emma de Vries · Demo record</span><button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Back to top <ArrowDown size={14} /></button></footer>
     </main>
 
-    {showAppointmentForm && <div className="modal-backdrop" role="presentation" onClick={() => setShowAppointmentForm(false)}><form className="appointment-modal" onSubmit={saveAppointment} onClick={event => event.stopPropagation()}><div className="modal-heading"><div><div className="card-kicker">PERSONAL CALENDAR</div><h2>Add an appointment</h2><p>For an appointment you arranged with the practice.</p></div><button type="button" className="modal-close" aria-label="Close" onClick={() => setShowAppointmentForm(false)}>×</button></div><label>Appointment type<input name="type" required defaultValue="GP follow-up"/></label><div className="form-row"><label>Date<input name="date" type="date" required defaultValue="2026-10-21"/></label><label>Time<input name="time" type="time" required defaultValue="10:00"/></label></div><p className="form-note"><UserRound size={14}/> This is a personal reminder; it does not book a visit with the practice.</p><div className="modal-actions"><button type="button" className="modal-cancel" onClick={() => setShowAppointmentForm(false)}>Cancel</button><button className="modal-save" type="submit"><Check size={15}/> Save to my calendar</button></div></form></div>}
+    {showAppointmentForm && <div className="modal-backdrop" role="presentation" onClick={() => setShowAppointmentForm(false)}><form className="appointment-modal" onSubmit={saveAppointment} onClick={event => event.stopPropagation()}><div className="modal-heading"><div><div className="card-kicker">PERSONAL CALENDAR</div><h2>Add an appointment</h2><p>For an appointment you arranged with the practice.</p></div><button type="button" className="modal-close" aria-label="Close" onClick={() => setShowAppointmentForm(false)}>×</button></div><label>Appointment type<input name="type" required defaultValue="GP follow-up"/></label><div className="form-row"><label>Date<input name="date" type="date" required defaultValue={selectedDate}/></label><label>Time<input name="time" type="time" required defaultValue="10:00"/></label></div><p className="form-note"><UserRound size={14}/> This is a personal reminder; it does not book a visit with the practice.</p><div className="modal-actions"><button type="button" className="modal-cancel" onClick={() => setShowAppointmentForm(false)}>Cancel</button><button className="modal-save" type="submit"><Check size={15}/> Save to my calendar</button></div></form></div>}
     {notice && <div className="notice" role="status">{notice}</div>}
   </div>;
 }
