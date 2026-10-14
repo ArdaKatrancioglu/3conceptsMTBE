@@ -27,7 +27,7 @@ function Landing(){
         <div className="card-footer"><span>EXPLORE CONCEPT 03</span><ArrowRight size={16}/></div>
       </a>
     </section>
-    <footer className="landing-footer"><span><Activity size={14}/> NORTHSIDE FAMILY PRACTICE · FUTURE CARE CONCEPTS</span><span>Prototype interfaces · Sample data only</span></footer>
+    <footer className="landing-footer"><span><Activity size={14}/> MTBE GROUP 9 · 3 CONCEPTS</span><span>Prototype interfaces · Sample data only</span></footer>
   </main>
 }
 createRoot(document.getElementById('root')).render(<Landing/>);
