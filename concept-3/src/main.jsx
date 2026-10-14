@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { ArrowDown, ArrowRight, CalendarDays, Check, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Clock3, MapPin, MessageSquare, Pill, Plus, Printer, Stethoscope, UserRound } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowRight, CalendarDays, Check, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Clock3, MapPin, MessageSquare, Pill, Plus, Printer, Stethoscope, UserRound } from 'lucide-react';
 import './style.css';
 
 const initialSteps = [
@@ -88,7 +88,9 @@ function App() {
 
   return <div className="page-shell">
     <header className="topbar">
-      <a className="practice-name" href="/" aria-label="Back to concept selection"><span className="practice-mark"><Stethoscope size={17} /></span><span>Northside Family Practice</span></a>
+      <a className="suite-back-home" href="/" aria-label="Back to concepts"><ArrowLeft size={15}/></a>
+      <div className="suite-brand"><span className="suite-brand-icon"><Stethoscope size={17} /></span><span className="suite-brand-copy"><b>MTBE Group 9</b><small>3 Concepts</small></span></div>
+      <span className="concept-marker">Concept 03 · Patient care</span>
       <nav className="top-nav" aria-label="Patient record">
         {[['summary', 'Visit summary'], ['calendar', 'Calendar'], ['medication', 'Medication & Extras']].map(([id, label]) => <button key={id} className={page === id ? 'selected' : ''} aria-current={page === id ? 'page' : undefined} onClick={() => navigate(id)}>{label}</button>)}
       </nav>
@@ -106,7 +108,7 @@ function App() {
           <div className="visit-card-top"><span className="visit-type"><Stethoscope size={15} /> GP consultation</span><span className="visit-date">12 October 2026</span></div>
           <h2 id="visit-title">Migraine</h2>
           <p className="visit-intro">You spoke with Dr. J. van Dijk about your headaches and how to manage them.</p>
-          <div className="doctor-row"><span className="doctor-avatar">JD</span><span><b>Dr. J. van Dijk</b><small>Your GP · Northside Family Practice</small></span></div>
+          <div className="doctor-row"><span className="doctor-avatar">JD</span><span><b>Dr. J. van Dijk</b><small>Your GP · Sample consultation</small></span></div>
         </section>
         <div className="main-grid">
           <div className="primary-column">
@@ -160,7 +162,7 @@ function App() {
         <div className="medication-columns">
           <div className="medication-main">
             <section className="page-panel directions-panel"><div className="panel-title-row"><div><h2>How to use</h2><p>Instructions recorded after your consultation</p></div><span className="instruction-label"><Stethoscope size={14}/> GP instructions</span></div><div className="direction-callout"><b>Use as needed for migraine.</b><p>Follow the directions on the pharmacy label and the advice from your GP. If anything is unclear, check with your pharmacist or practice.</p></div><div className="direction-row"><span>Medicine</span><b>Sumatriptan</b></div><div className="direction-row"><span>Strength</span><b>50 mg</b></div><div className="direction-row"><span>Purpose</span><b>Migraine</b></div></section>
-            <section className="page-panel prescription-history"><div className="panel-title-row"><div><h2>Prescription details</h2><p>From your visit on 12 October</p></div><span className="history-count">1 prescription</span></div><div className="prescription-row"><span className="history-icon"><CheckCircle2 size={17}/></span><div><b>Prescription sent to pharmacy</b><small>12 October 2026 · Northside Family Practice</small></div><span className="history-complete">Ready</span></div><div className="prescription-row"><span className="history-icon pickup-icon"><MapPin size={17}/></span><div><b>Collect from Linden Pharmacy</b><small>15 October 2026 · after 09:00</small></div><button className="inline-arrow" onClick={() => showNotice('Linden Pharmacy · 14 Linden Street · Open until 18:00')} aria-label="Pharmacy details"><ArrowRight size={16}/></button></div></section>
+            <section className="page-panel prescription-history"><div className="panel-title-row"><div><h2>Prescription details</h2><p>From your visit on 12 October</p></div><span className="history-count">1 prescription</span></div><div className="prescription-row"><span className="history-icon"><CheckCircle2 size={17}/></span><div><b>Prescription sent to pharmacy</b><small>12 October 2026 · Sample consultation</small></div><span className="history-complete">Ready</span></div><div className="prescription-row"><span className="history-icon pickup-icon"><MapPin size={17}/></span><div><b>Collect from Linden Pharmacy</b><small>15 October 2026 · after 09:00</small></div><button className="inline-arrow" onClick={() => showNotice('Linden Pharmacy · 14 Linden Street · Open until 18:00')} aria-label="Pharmacy details"><ArrowRight size={16}/></button></div></section>
           </div>
           <aside className="medication-side">
             <section className="page-panel pharmacy-panel"><span className="side-icon"><MapPin size={17}/></span><div className="card-kicker">COLLECTION</div><h2>Linden Pharmacy</h2><p>14 Linden Street<br/>Open today until 18:00</p><div className="pharmacy-meta"><Clock3 size={15}/> Prescription ready tomorrow after 09:00</div><button className="secondary-action" onClick={() => showNotice('Linden Pharmacy · 020 555 0187')}>Pharmacy contact details <ArrowRight size={14}/></button></section>

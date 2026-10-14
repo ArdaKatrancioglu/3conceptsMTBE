@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Activity, Bell, Check, CheckCircle2, ChevronDown, ChevronRight, Clock3, Home, MapPin, Pill, Plus, ShoppingBag, Smartphone, Users, Volume2, X } from 'lucide-react';
+import { Activity, ArrowLeft, Bell, Check, CheckCircle2, ChevronDown, ChevronRight, Clock3, Home, MapPin, Pill, Plus, ShoppingBag, Smartphone, Users, Volume2, X } from 'lucide-react';
 import './style.css';
 
 const sampleMeds = [
@@ -52,7 +52,9 @@ function App() {
 
   return <div className="daily-app">
     <header className="daily-header">
-      <a className="daily-brand" href="/"><span className="daily-brand-icon"><Activity size={18}/></span><span>Daily care</span><small>CONCEPT 01</small></a>
+      <a className="daily-back-home" href="/" aria-label="Back to concepts"><ArrowLeft size={15}/></a>
+      <div className="suite-brand"><span className="suite-brand-icon"><Activity size={17}/></span><span className="suite-brand-copy"><b>MTBE Group 9</b><small>3 Concepts</small></span></div>
+      <span className="concept-marker">Concept 01 · Daily care</span>
       <nav className="daily-nav"><a className="active" href="#today">Today</a><a href="#medication">Medication</a><a href="#family">Family & home</a></nav>
       <button className={'notification-button '+(!notifications?'muted':'')} aria-label="Toggle notifications" onClick={() => {setNotifications(!notifications);toast(notifications?'Notifications paused':'Notifications enabled');}}><Bell size={18}/><i/></button>
       <button className="daily-user" onClick={() => toast('Patient profile · Emma de Vries')}><span>EV</span><b>Emma de Vries</b><ChevronDown size={14}/></button>

@@ -5,8 +5,8 @@ import './style.css';
 
 function Landing(){
   return <main className="landing">
-    <header className="top"><a className="brand" href="/"><span><Activity size={19}/></span> care concepts</a><div className="top-note"><LockKeyhole size={14}/> Product concepts · 2026</div></header>
-    <section className="intro"><div className="overline"><i/> CARE CONCEPTS</div><h1>GP consultation<br/><em>tools and patient follow-up.</em></h1><p>Select a concept to open its prototype.</p><div className="concept-count"><span>03</span> CONCEPTS <b/></div></section>
+    <header className="top"><a className="brand" href="/"><span><Activity size={19}/></span> MTBE Group 9 <small>3 Concepts</small></a><div className="top-note"><LockKeyhole size={14}/> Product concepts · 2026</div></header>
+    <section className="intro"><div className="overline"><i/> MTBE GROUP 9 · 3 CONCEPTS</div><h1>GP consultation<br/><em>tools and patient follow-up.</em></h1><p>Select a concept to open its prototype.</p><div className="concept-count"><span>03</span> CONCEPTS <b/></div></section>
     <section className="cards">
       <a className="concept-card card-one" href="/concept-1/">
         <div className="card-top"><span className="number">CONCEPT 01</span><span className="open-icon"><ArrowRight size={17}/></span></div>
