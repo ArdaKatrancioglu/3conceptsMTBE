@@ -70,7 +70,7 @@ function App() {
   const pageMeta = {
     summary: ['AFTER YOUR APPOINTMENT', 'Your visit summary', 'A clear record of what you discussed with your GP.'],
     calendar: ['YOUR CARE PLAN', 'Calendar', 'Appointments and care reminders in one place.'],
-    medication: ['YOUR PRESCRIPTION', 'Medication & extras', 'Prescription and collection details from your GP visit.'],
+    medication: ['YOUR PRESCRIPTION', 'Medication & Extras', 'Prescription and collection details from your GP visit.'],
   }[page];
 
   const monthStart = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), 1);
@@ -90,7 +90,7 @@ function App() {
     <header className="topbar">
       <a className="practice-name" href="/" aria-label="Back to concept selection"><span className="practice-mark"><Stethoscope size={17} /></span><span>Northside Family Practice</span></a>
       <nav className="top-nav" aria-label="Patient record">
-        {[['summary', 'Visit summary'], ['calendar', 'Calendar'], ['medication', 'Medication & extras']].map(([id, label]) => <button key={id} className={page === id ? 'selected' : ''} aria-current={page === id ? 'page' : undefined} onClick={() => navigate(id)}>{label}</button>)}
+        {[['summary', 'Visit summary'], ['calendar', 'Calendar'], ['medication', 'Medication & Extras']].map(([id, label]) => <button key={id} className={page === id ? 'selected' : ''} aria-current={page === id ? 'page' : undefined} onClick={() => navigate(id)}>{label}</button>)}
       </nav>
       <button className="patient-menu" onClick={() => showNotice('Signed in as Emma de Vries')}><span className="avatar">EV</span><span>Emma de Vries</span><ChevronDown size={15} /></button>
     </header>
@@ -128,7 +128,7 @@ function App() {
           </div>
           <aside className="side-column">
             <button className="summary-link-card" onClick={() => navigate('calendar')}><span className="side-icon calendar"><CalendarDays size={17} /></span><span><b>Calendar</b><small>{appointment ? `${appointment.type} · ${appointment.date}` : 'No follow-up booked'}</small></span><ArrowRight size={16} /></button>
-            <button className="summary-link-card" onClick={() => navigate('medication')}><span className="side-icon"><Pill size={17} /></span><span><b>Medication & extras</b><small>Sumatriptan · 50 mg · pickup tomorrow</small></span><ArrowRight size={16} /></button>
+            <button className="summary-link-card" onClick={() => navigate('medication')}><span className="side-icon"><Pill size={17} /></span><span><b>Medication & Extras</b><small>Sumatriptan · 50 mg · pickup tomorrow</small></span><ArrowRight size={16} /></button>
             <button className="contact-card" onClick={() => showNotice('Your practice contact details are ready.')}><span className="contact-icon"><MessageSquare size={17} /></span><span><b>Questions about this summary?</b><small>Contact your family practice</small></span><ArrowRight size={16} /></button>
           </aside>
         </div>
