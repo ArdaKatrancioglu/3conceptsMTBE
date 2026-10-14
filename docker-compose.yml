@@ -1,0 +1,23 @@
+services:
+  web:
+    build: .
+    restart: unless-stopped
+    expose:
+      - "80"
+    networks:
+      - concepts
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run
+    restart: unless-stopped
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?Add your Cloudflare Tunnel token to .env}
+    depends_on:
+      - web
+    networks:
+      - concepts
+
+networks:
+  concepts:
+    driver: bridge
