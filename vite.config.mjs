@@ -11,6 +11,10 @@ function canonicalConceptPaths() {
         res.end();
         return;
       }
+      if (path === '/concept-3/appointments' || path === '/concept-3/medication') {
+        const query = req.url?.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+        req.url = `/concept-3/${query}`;
+      }
       next();
     });
   };
