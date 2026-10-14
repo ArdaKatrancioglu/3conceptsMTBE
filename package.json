@@ -5,6 +5,7 @@
   "workspaces": ["concept-2", "concept-3"],
   "scripts": {
     "dev": "vite --host 0.0.0.0",
+    "dev:concept-1": "vite --host 0.0.0.0 --open /concept-1/",
     "dev:concept-2": "vite --host 0.0.0.0 --open /concept-2/",
     "dev:concept-3": "vite --host 0.0.0.0 --open /concept-3/",
     "build": "vite build",

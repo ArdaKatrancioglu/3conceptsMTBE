@@ -5,7 +5,7 @@ function canonicalConceptPaths() {
   const redirect = (server) => {
     server.middlewares.use((req, res, next) => {
       const path = req.url?.split('?')[0];
-      if (path === '/concept-2' || path === '/concept-3') {
+      if (path === '/concept-1' || path === '/concept-2' || path === '/concept-3') {
         res.statusCode = 302;
         res.setHeader('Location', `${path}/`);
         res.end();
@@ -31,6 +31,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(process.cwd(), 'index.html'),
+        concept1: resolve(process.cwd(), 'concept-1/index.html'),
         concept2: resolve(process.cwd(), 'concept-2/index.html'),
         concept3: resolve(process.cwd(), 'concept-3/index.html'),
       },

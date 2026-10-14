@@ -1,8 +1,9 @@
 # Care concepts
 
-One local Vite app serves a small concept orchestrator and both standalone React concepts:
+One local Vite app serves a small concept orchestrator and three standalone React concepts:
 
 - `/` — concept selector / orchestrator
+- `/concept-1` — daily care at home, medication reminders, family and devices
 - `/concept-2` — GP consultation assistant
 - `/concept-3` — patient care overview
 
@@ -13,9 +14,9 @@ npm install
 npm run dev
 ```
 
-Open the local URL Vite prints, then choose a concept or navigate directly to `/concept-2` or `/concept-3`. You can also run `npm run dev:concept-2` or `npm run dev:concept-3` to open a concept directly.
+Open the local URL Vite prints, then choose a concept or navigate directly to `/concept-1`, `/concept-2` or `/concept-3`. You can also run the `dev:concept-*` scripts to open a concept directly.
 
-`npm run build` creates a production build containing all three pages. The concepts use fictional sample data and have no backend integration.
+`npm run build` creates a production build containing all four pages. The concepts use fictional sample data and have no backend integration.
 
 ## Deploy with Docker Compose
 
