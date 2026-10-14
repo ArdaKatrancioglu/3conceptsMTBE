@@ -1,36 +1,95 @@
 import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Activity, ArrowDownRight, ArrowRight, Bell, CalendarDays, Check, CheckCircle2, ChevronDown, ChevronRight, CircleHelp, Clock3, FileText, Heart, Home, MapPin, Menu, MessageCircle, Pill, Plus, Search, ShieldCheck, Sparkles, Stethoscope, Sun, UserRound, X } from 'lucide-react';
+import { ArrowDown, ArrowRight, CalendarDays, Check, ChevronDown, Clock3, MapPin, MessageSquare, Pill, Printer, Stethoscope } from 'lucide-react';
 import './style.css';
 
-const initialTasks = [
-  { id: 1, time: '08:00', name: 'Take your medication', detail: 'Sumatriptan · 1 tablet with water', icon: Pill, done: true },
-  { id: 2, time: '12:30', name: 'Drink a large glass of water', detail: 'A steady routine may help with migraine', icon: Sun, done: false },
-  { id: 3, time: 'Tomorrow', name: 'Pick up your repeat prescription', detail: 'The Linden Pharmacy · ready for pickup', icon: MapPin, done: false },
+const initialSteps = [
+  { id: 1, time: 'Today · 12:30', title: 'Drink a glass of water', note: 'Keep water nearby through the day', complete: false },
+  { id: 2, time: 'Tomorrow', title: 'Collect your prescription', note: 'Linden Pharmacy · ready after 09:00', complete: false },
 ];
-function App(){
-  const [tab,setTab]=useState('Overview'); const [tasks,setTasks]=useState(initialTasks); const [gp,setGp]=useState(false); const [notice,setNotice]=useState(''); const [open,setOpen]=useState(false);
-  const toggle=(id)=>setTasks(tasks.map(t=>t.id===id?{...t,done:!t.done}:t));
-  const toast=(msg)=>{setNotice(msg);setTimeout(()=>setNotice(''),2400)};
-  const nav=[['Overview',Home],['My care',Heart],['Appointments',CalendarDays],['Messages',MessageCircle]];
-  return <div className="app-shell">
-    <aside className="sidebar"><a className="brand" href="/" aria-label="All concepts"><div className="brand-mark"><Activity size={20}/></div><span>carecompass<small>your care, made clear</small></span></a>
-      <div className="profile"><div className="avatar">EV</div><div><b>Emma de Vries</b><small>Patient at Northside Family Practice</small></div><ChevronDown size={16}/></div>
-      <div className="nav-label">MY SPACE</div><nav>{nav.map(([name,Icon])=><button key={name} className={'nav-item '+(tab===name?'active':'')} onClick={()=>setTab(name)}><Icon size={18}/>{name}{name==='Messages'&&<span className="badge">1</span>}</button>)}</nav>
-      <div className="sidebar-bottom"><div className="help-box"><div className="help-icon"><CircleHelp size={17}/></div><b>Need to talk?</b><p>Your family practice is here for you.</p><button onClick={()=>toast('Your message to the practice is ready.')}>Ask a question <ArrowRight size={14}/></button></div><div className="privacy"><ShieldCheck size={15}/> Your information is secure</div><button className="mode-switch" onClick={()=>setGp(!gp)}><Stethoscope size={16}/>{gp?'Patient view':'Switch to clinician view'}<ArrowRight size={14}/></button></div>
-    </aside>
-    <main className="main"><header className="topbar"><button className="mobile-menu" onClick={()=>setOpen(!open)}><Menu size={20}/></button><div className="crumb">My space <ChevronRight size={14}/> <b>{tab}</b></div><div className="top-actions"><button className="icon-button" onClick={()=>toast('You’re all caught up.')} aria-label="Notifications"><Bell size={18}/><i/></button><div className="mini-avatar">EV</div></div></header>
-      <div className="content"><div className="welcome-row"><div><div className="eyebrow"><span className="live-dot"/> WEDNESDAY, OCTOBER 14, 2026</div><h1>Good morning, Emma <span>☀️</span></h1><p className="subtitle">Welcome back. Here’s your personal care overview.</p></div><button className="outline-btn" onClick={()=>toast('Your personal overview is being prepared.')}><FileText size={16}/> Share overview</button></div>
-      {gp&&<div className="gp-banner"><Stethoscope size={17}/> Clinician view <span>Demo patient record · Emma de Vries</span><button onClick={()=>setGp(false)}><X size={16}/></button></div>}
-      <section className="hero-card"><div className="hero-copy"><div className="tag"><Sparkles size={13}/> YOUR VISIT, SUMMARIZED</div><h2>Migraine: your plan<br/>for the weeks ahead</h2><p>Dr. J. van Dijk has organized the key points from your conversation in one place.</p><div className="hero-meta"><div className="doctor-avatar">JD</div><span><b>Dr. J. van Dijk</b><small>Family doctor · October 12, 2026</small></span><span className="read-time"><Clock3 size={14}/> 4 min read</span></div><button className="hero-button" onClick={()=>document.getElementById('summary').scrollIntoView({behavior:'smooth'})}>View your summary <ArrowRight size={16}/></button></div><div className="hero-art"><div className="sun-disc"><Sun size={48}/></div><div className="art-orbit orbit-one"/><div className="art-orbit orbit-two"/><div className="floating-note"><span className="note-icon"><Heart size={16}/></span><span><b>One step at a time</b><small>You’re not alone in this</small></span><CheckCircle2 size={18} className="note-check"/></div><div className="art-leaf leaf-a">✳</div><div className="art-leaf leaf-b">✦</div></div><div className="hero-index">01 <span>/ 03</span></div></section>
-      <div className="section-head"><div><div className="eyebrow">YOUR DAY, IN BALANCE</div><h2>What’s on your agenda?</h2></div><button className="text-btn" onClick={()=>setTab('Afspraken')}>Full calendar <ArrowRight size={15}/></button></div>
-      <div className="dashboard-grid"><section className="panel agenda-panel"><div className="panel-title"><div className="title-icon mint"><CalendarDays size={18}/></div><div><b>Today for you</b><small>A few small steps</small></div><span className="count">{tasks.filter(t=>!t.done).length} open</span></div><div className="task-list">{tasks.map((task,i)=><div className={'task '+(task.done?'completed':'')} key={task.id}><div className="task-time">{task.time}</div><button className="task-check" onClick={()=>toggle(task.id)}>{task.done&&<Check size={13}/>}</button><div className="task-content"><b>{task.name}</b><small>{task.detail}</small></div><div className="task-icon"><task.icon size={17}/></div>{i<tasks.length-1&&<div className="task-line"/>}</div>)}</div><button className="panel-link" onClick={()=>toast('Your calendar is up to date.')}>View all appointments <ArrowRight size={15}/></button></section>
-      <section className="panel medicine-panel"><div className="panel-title"><div className="title-icon peach"><Pill size={18}/></div><div><b>Medication</b><small>As discussed with your doctor</small></div><button className="more-btn" onClick={()=>toast('Medication details opened.')}>•••</button></div><div className="medicine-card"><div className="med-top"><div className="pill-illustration"><Pill size={24}/></div><span className="status-chip"><span/> Active</span></div><b>Sumatriptan</b><p>50 mg · as needed for migraine</p><div className="med-divider"/><div className="med-foot"><span><Clock3 size={14}/> Max. 2 per day</span><button onClick={()=>toast('Usage instructions opened.')}>How to use <ChevronRight size={14}/></button></div></div><div className="refill"><div className="refill-mark"><CheckCircle2 size={16}/></div><span><b>Repeat prescription requested</b><small>Pick it up tomorrow at The Linden Pharmacy</small></span><ChevronRight size={16}/></div></section></div>
-      <section id="summary" className="summary-section"><div className="summary-heading"><div><div className="eyebrow">GOOD TO KNOW</div><h2>Your migraine guide</h2><p>Information from your visit, ready to revisit whenever you need it.</p></div><button className="outline-btn" onClick={()=>toast('Guide saved to My care.')}><Plus size={16}/> Save</button></div><div className="guide-grid"><article className="guide-card"><div className="guide-number">01</div><div className="guide-icon lavender"><Activity size={19}/></div><h3>What is migraine?</h3><p>A condition that can cause recurring headaches. Sometimes you may notice changes before an episode.</p><button onClick={()=>toast('Opened: What is migraine?')}>Learn more <ArrowRight size={14}/></button></article><article className="guide-card"><div className="guide-number">02</div><div className="guide-icon yellow"><Sun size={19}/></div><h3>What can you do?</h3><p>Regular sleep, meals, and hydration may help. Notice what might trigger an episode for you.</p><button onClick={()=>toast('Opened: What can you do?')}>View tips <ArrowRight size={14}/></button></article><article className="guide-card"><div className="guide-number">03</div><div className="guide-icon blue"><ArrowDownRight size={19}/></div><h3>When should you get in touch?</h3><p>Talk to your doctor if episodes change, happen more often, or your medication isn’t helping enough.</p><button onClick={()=>toast('Opened: When to get in touch?')}>Learn when <ArrowRight size={14}/></button></article></div></section>
-      <section className="followup"><div className="follow-icon"><MessageCircle size={20}/></div><div><div className="eyebrow">LET’S CHECK IN</div><b>How have you been since our conversation?</b><p>Your experience helps us prepare for your next appointment.</p></div><button onClick={()=>toast('Thanks! Your check-in has started.')}>Start a quick check-in <ArrowRight size={15}/></button></section>
-      <footer><span>Thoughtfully made for your care.</span><span><ShieldCheck size={14}/> Personal · Trusted · Together</span></footer>
+
+function App() {
+  const [steps, setSteps] = useState(initialSteps);
+  const [notice, setNotice] = useState('');
+  const [activeNav, setActiveNav] = useState('Visit summary');
+
+  function showNotice(message) {
+    setNotice(message);
+    window.clearTimeout(showNotice.timer);
+    showNotice.timer = window.setTimeout(() => setNotice(''), 2400);
+  }
+
+  function toggleStep(id) {
+    setSteps(current => current.map(step => step.id === id ? { ...step, complete: !step.complete } : step));
+  }
+
+  return <div className="page-shell">
+    <header className="topbar">
+      <a className="practice-name" href="/" aria-label="Back to concept selection"><span className="practice-mark"><Stethoscope size={17} /></span><span>Northside Family Practice</span></a>
+      <nav className="top-nav" aria-label="Patient record">
+        {['Visit summary', 'Appointments', 'Medication'].map((item) => <button key={item} className={activeNav === item ? 'selected' : ''} onClick={() => {
+          setActiveNav(item);
+          if (item !== 'Visit summary') document.getElementById(item === 'Appointments' ? 'next-steps' : 'medication')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }}>{item}</button>)}
+      </nav>
+      <button className="patient-menu" onClick={() => showNotice('Signed in as Emma de Vries')}><span className="avatar">EV</span><span>Emma de Vries</span><ChevronDown size={15} /></button>
+    </header>
+
+    <main className="content">
+      <div className="page-heading">
+        <div><div className="overline">AFTER YOUR APPOINTMENT</div><h1>Your visit summary</h1><p>A clear record of what you discussed with your GP.</p></div>
+        <button className="quiet-button" onClick={() => window.print()}><Printer size={16} /> Print</button>
       </div>
-    </main>{notice&&<div className="toast"><CheckCircle2 size={17}/>{notice}</div>}
-  </div>
+
+      <section className="visit-card" aria-labelledby="visit-title">
+        <div className="visit-card-top"><span className="visit-type"><Stethoscope size={15} /> GP consultation</span><span className="visit-date">12 October 2026</span></div>
+        <h2 id="visit-title">Migraine</h2>
+        <p className="visit-intro">You spoke with Dr. J. van Dijk about your headaches and how to manage them.</p>
+        <div className="doctor-row"><span className="doctor-avatar">JD</span><span><b>Dr. J. van Dijk</b><small>Your GP · Northside Family Practice</small></span></div>
+      </section>
+
+      <div className="main-grid">
+        <div className="primary-column">
+          <section className="content-section" id="summary">
+            <div className="section-title"><span className="section-number">01</span><div><h2>What we discussed</h2><p>Notes from your appointment</p></div></div>
+            <div className="note-card">
+              <div className="note-row"><h3>About migraine</h3><p>Migraine can cause recurring headaches. Some people notice warning signs before the pain starts.</p></div>
+              <div className="note-row"><h3>What may help</h3><p>Keeping regular sleep and meal times may help. Your GP suggested noting when headaches happen and what was going on that day.</p></div>
+              <div className="note-row"><h3>When to contact the practice</h3><p>Get in touch if your headaches change, become more frequent, or your medication is not helping.</p></div>
+            </div>
+          </section>
+
+          <section className="content-section" id="next-steps">
+            <div className="section-title"><span className="section-number">02</span><div><h2>Your next steps</h2><p>Things to remember after the visit</p></div></div>
+            <div className="steps-card">{steps.map((step, index) => <div className={'step-row ' + (step.complete ? 'is-complete' : '')} key={step.id}>
+              <span className="step-time">{step.time}</span><button className="step-check" aria-label={step.complete ? 'Mark incomplete' : 'Mark complete'} onClick={() => toggleStep(step.id)}>{step.complete && <Check size={14} />}</button><div className="step-copy"><b>{step.title}</b><small>{step.note}</small></div>
+              {index === 0 && <span className="step-rule" />}
+            </div>)}</div>
+          </section>
+        </div>
+
+        <aside className="side-column">
+          <section className="side-card" id="medication">
+            <div className="side-heading"><span className="side-icon"><Pill size={17} /></span><div><h2>Medication</h2><p>As discussed with your GP</p></div></div>
+            <div className="medicine-name">Sumatriptan <span>50 mg</span></div>
+            <p className="medicine-detail">Take as needed for migraine. Follow the instructions on the packet.</p>
+            <div className="side-divider" />
+            <div className="pickup"><MapPin size={16} /><span><b>Linden Pharmacy</b><small>Ready for collection tomorrow after 09:00</small></span></div>
+          </section>
+
+          <section className="side-card appointment-card">
+            <div className="side-heading"><span className="side-icon calendar"><CalendarDays size={17} /></span><div><h2>Follow-up</h2><p>Next appointment</p></div></div>
+            <div className="appointment-empty"><Clock3 size={16} /><span>No follow-up appointment booked</span></div>
+          </section>
+
+          <button className="contact-card" onClick={() => showNotice('Your practice contact details are ready.') }><span className="contact-icon"><MessageSquare size={17} /></span><span><b>Questions about this summary?</b><small>Contact your family practice</small></span><ArrowRight size={16} /></button>
+        </aside>
+      </div>
+
+      <footer className="page-footer"><span>Visit summary · 12 October 2026</span><button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Back to top <ArrowDown size={14} /></button></footer>
+    </main>
+    {notice && <div className="notice" role="status">{notice}</div>}
+  </div>;
 }
+
 createRoot(document.getElementById('root')).render(<App/>);
