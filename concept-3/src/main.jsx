@@ -81,6 +81,7 @@ function App() {
   const calendarEvents = [
     { date: '2026-10-12', kind: 'appointment', title: 'GP consultation', detail: 'Dr. J. van Dijk · Migraine' },
     { date: '2026-10-14', kind: 'reminder', title: 'Headache diary', detail: 'Note when a headache starts and what you were doing.' },
+    { date: '2026-10-28', kind: 'appointment', title: 'GP follow-up', detail: 'Dr. J. van Dijk · 10:30' },
     { date: '2026-10-15', kind: 'pickup', title: 'Prescription collection', detail: 'Linden Pharmacy · after 09:00' },
     ...(appointment ? [{ date: appointment.date, kind: 'appointment', title: appointment.type, detail: `${appointment.time} · Personal calendar entry` }] : []),
   ];
@@ -89,8 +90,7 @@ function App() {
   return <div className="page-shell">
     <header className="topbar">
       <a className="suite-back-home" href="/" aria-label="Back to concepts"><ArrowLeft size={15}/></a>
-      <div className="suite-brand"><span className="suite-brand-icon"><Stethoscope size={17} /></span><span className="suite-brand-copy"><b>MTBE Group 9</b><small>3 Concepts</small></span></div>
-      <span className="concept-marker">Concept 03 · Patient care</span>
+      <span className="concept-title">Patient care</span>
       <nav className="top-nav" aria-label="Patient record">
         {[['summary', 'Visit summary'], ['calendar', 'Calendar'], ['medication', 'Medication & Extras']].map(([id, label]) => <button key={id} className={page === id ? 'selected' : ''} aria-current={page === id ? 'page' : undefined} onClick={() => navigate(id)}>{label}</button>)}
       </nav>
@@ -153,7 +153,7 @@ function App() {
           <section className="page-panel selected-day-panel"><div className="selected-date-heading"><div><div className="card-kicker">SELECTED DAY</div><h2>{prettyDate(new Date(`${selectedDate}T12:00:00`))}</h2></div><span className="selected-date-icon"><CalendarDays size={18}/></span></div>
             {selectedEvents.length ? <div className="selected-events">{selectedEvents.map((event, index) => <article className="selected-event" key={`${event.date}-${event.title}-${index}`}><span className={`event-type-icon ${event.kind}`}>{event.kind === 'pickup' ? <Pill size={16}/> : event.kind === 'appointment' ? <Stethoscope size={16}/> : <CheckCircle2 size={16}/>}</span><div><span className="event-label">{event.kind === 'pickup' ? 'PRESCRIPTION PICKUP' : event.kind === 'appointment' ? 'APPOINTMENT' : 'CARE REMINDER'}</span><h3>{event.title}</h3><p>{event.detail}</p>{event.kind === 'appointment' && event.date === '2026-10-12' && <button onClick={() => navigate('summary')}>View visit summary <ArrowRight size={13}/></button>}{event.kind === 'pickup' && <button onClick={() => navigate('medication')}>View medication <ArrowRight size={13}/></button>}</div></article>)}</div> : <div className="day-empty"><CalendarDays size={20}/><b>Nothing planned for this day</b><span>Add an appointment or reminder you arranged yourself.</span><button onClick={() => setShowAppointmentForm(true)}><Plus size={14}/> Add to calendar</button></div>}
           </section>
-          <section className="page-panel upcoming-panel"><div className="panel-title-row"><div><h2>Coming up</h2><p>Next items in your care plan</p></div></div><button className="upcoming-row" onClick={() => {setSelectedDate('2026-10-15'); setCalendarMonth(new Date(2026, 9, 1));}}><span className="upcoming-date">15<small>OCT</small></span><span><b>Prescription pickup</b><small>Linden Pharmacy · after 09:00</small></span><ChevronRight size={15}/></button>{appointment && <button className="upcoming-row" onClick={() => {setSelectedDate(appointment.date); setCalendarMonth(new Date(`${appointment.date}T12:00:00`));}}><span className="upcoming-date">{appointment.date.slice(8, 10)}<small>{new Intl.DateTimeFormat('en-GB', { month: 'short' }).format(new Date(`${appointment.date}T12:00:00`)).toUpperCase()}</small></span><span><b>{appointment.type}</b><small>{appointment.time} · Personal calendar</small></span><ChevronRight size={15}/></button>}<div className="calendar-help"><span className="side-icon calendar"><Clock3 size={16}/></span><p>Your GP suggested keeping a headache diary before your next visit.</p></div></section>
+          <section className="page-panel upcoming-panel"><div className="panel-title-row"><div><h2>Coming up</h2><p>Appointments and reminders</p></div></div>{calendarEvents.filter(event => event.date >= '2026-10-14' && event.kind !== 'pickup').sort((a, b) => a.date.localeCompare(b.date)).slice(0, 3).map(event => { const date = new Date(`${event.date}T12:00:00`); return <button className="upcoming-row" key={`${event.date}-${event.title}`} onClick={() => {setSelectedDate(event.date); setCalendarMonth(new Date(date.getFullYear(), date.getMonth(), 1));}}><span className="upcoming-date">{date.getDate()}<small>{new Intl.DateTimeFormat('en-GB', { month: 'short' }).format(date).toUpperCase()}</small></span><span><b>{event.title}</b><small>{event.detail}</small></span><ChevronRight size={15}/></button>; })}{calendarEvents.filter(event => event.date >= '2026-10-14' && event.kind !== 'pickup').length === 0 && <div className="upcoming-empty">No upcoming appointments or reminders.</div>}</section>
         </aside>
       </div>}
 

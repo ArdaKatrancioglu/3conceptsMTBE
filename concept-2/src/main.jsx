@@ -46,8 +46,7 @@ function App() {
   return <div className="tool-shell">
     <header className="tool-topbar">
       <a className="suite-back-home" href="/" aria-label="Back to concepts"><ArrowLeft size={15}/></a>
-      <div className="suite-brand"><span className="suite-brand-icon"><Activity size={17}/></span><span className="suite-brand-copy"><b>MTBE Group 9</b><small>3 Concepts</small></span></div>
-      <span className="concept-marker">Concept 02 · GP dictation</span>
+      <span className="concept-title">GP dictation</span>
       <div className="destination"><span className="destination-dot"/> HIS destination <b>Practice system · Demo</b><ChevronDown size={14}/></div>
     </header>
 
